@@ -1,4 +1,4 @@
-﻿namespace P8_Secv;
+﻿namespace P8_Secv.Sequence;
 
 public static class PrimeNumberExtension
 {
