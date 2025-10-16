@@ -1,15 +1,9 @@
-﻿namespace P6_Inmultire
+﻿namespace P6_Inmultire;
+
+public class Table(int tblPadding)
 {
-    public class Table
-    {
-        public int TblPadding { get; }
+    public int TblPadding { get; } = tblPadding;
 
-        public Table(int tblPadding)
-        {
-            this.TblPadding = tblPadding;
-        }
-
-        public void PrintCell(object value) => Console.Write("|" + $"{value}".PadLeft(TblPadding));
-        public void EndLine() => Console.WriteLine("|");
-    }
+    public void PrintCell(object value) => Console.Write("|" + $"{value}".PadLeft(TblPadding));
+    public void EndLine() => Console.WriteLine("|");
 }
