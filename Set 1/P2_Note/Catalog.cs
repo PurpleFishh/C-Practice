@@ -6,76 +6,74 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P2_Note.Grader;
 
 namespace P2_Note
 {
     public class Catalog
     {
         private bool _running = true;
-        private Dictionary<string, List<double>> lectureGrades = new();
+        private readonly IGrader _lectureGrades = new LectureGrades();
 
         public void Start()
         {
             Console.WriteLine("Enter the grade, when done enter -");
             while (_running)
             {
-                Console.Write("Enter lecture: ");
-                var lecture = Console.ReadLine();
-                if (String.IsNullOrWhiteSpace(lecture))
-                {
-                    Console.WriteLine("Please enter a valid lecture name!");
+                if (!TakeInput("lecture", out var lecture))
                     continue;
-                }
+
                 if (lecture == "-")
                 {
-                    GradesDisplay(lectureGrades);
+                    Console.WriteLine(_lectureGrades);
                     _running = false;
                     continue;
                 }
 
-                if (!lectureGrades.ContainsKey(lecture))
-                    lectureGrades[lecture] = new List<double>();
-
                 Console.WriteLine($"Enter grades for lecture {lecture} (- to stop)");
-                bool gradesRecording = true;
-                while (gradesRecording)
+                while (true)
                 {
-                    Console.Write($"Grade {lectureGrades[lecture].Count + 1}: ");
-                    var input = Console.ReadLine() ?? "";
+                    var gradesCount = _lectureGrades.GetGrades(lecture).Count;
+                    if (!TakeInput($"grade {gradesCount + 1}", out var input))
+                        continue;
                     if (input == "-")
-                        gradesRecording = false;
+                        break;
 
-                    var grade = ValidateGrade(input);
-                    if(grade.HasValue)
-                        lectureGrades[lecture].Add(grade.Value);
+                    if (!ValidateGrade(input, out var grade)) continue;
+                    try
+                    {
+                        _lectureGrades.AddGrade(lecture, grade);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
             }
         }
 
-        private double? ValidateGrade(string input)
+        private bool ValidateGrade(string input, out double grade)
         {
-            if (!double.TryParse(input, NumberStyles.Float, CultureInfo.CurrentCulture, out var grade))
-            {
-                Console.WriteLine("Enter a valid grade");
-                return null;
-            }
-            if (grade < 0 || grade > 100)
-            {
-                Console.WriteLine("Please enter a grade between 0.0 and 100.0");
-                return null;
-            }
-            return grade;
+            if (double.TryParse(input, out grade)) return true;
+
+            Console.WriteLine("Enter a valid grade");
+            return false;
         }
 
-        private void GradesDisplay(Dictionary<string, List<double>> lectureGrades)
+        private bool TakeInput(string param, out string input)
         {
-            if (lectureGrades.Count == 0)
-                Console.WriteLine("No lecture recorded...");
-            foreach (var grades in lectureGrades)
+            Console.WriteLine($"Enter a {param}: ");
+            var userInput = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(userInput))
             {
-                var finalGrade = grades.Value.Sum(x => x) / grades.Value.Count;
-                Console.WriteLine($"Final grade for {grades.Key}: {finalGrade}");
+                Console.WriteLine($"Please enter a valid {param}!");
+                input = string.Empty;
+                return false;
             }
+
+            input = userInput;
+            return true;
         }
     }
 }
