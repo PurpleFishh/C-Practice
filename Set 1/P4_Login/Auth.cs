@@ -4,109 +4,84 @@ using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Login.User;
+using P4_Login.User.UserService;
 
-namespace P4_Login
+namespace P4_Login;
+
+public class Auth
 {
-    public class Auth
+    private bool _running = true;
+    private readonly IUserService _userService;
+
+    public Auth()
     {
-        private bool _running = true;
-        private Dictionary<string, User> users = new();
+        _userService = new UserService(new InMemoryUserStore());
+        Main();
+    }
 
-        public Auth()
+    private void Main()
+    {
+        Console.WriteLine("Auth is running(- to stop it)");
+        while (_running)
         {
-            Main();
-        }
+            if (!TakeInput("username", out string username))
+                continue;
 
-        private void Main()
-        {
-            Console.WriteLine("Auth is running(- to stop it)");
-            while (_running)
+            if (username == "-")
             {
-                if (!TakeInput("username", out string username))
-                    continue;
-
-                if (username == "-")
-                {
-                    _running = false;
-                    continue;
-                }
-
-                var login = users.ContainsKey(username);
-                if (!login)
-                    Console.WriteLine("No user found, please register!");
-
-                var attempts = 3;
-                while (attempts > 0)
-                {
-                    if (!TakeInput("password", out string password))
-                        continue;
-
-                    if (!login)
-                        users[username] = new User(username, password);
-
-                    var user = users[username];
-                    if (user.Auth(password))
-                    {
-                        Console.WriteLine("Auth with success!");
-                        var lastLogin = user.GetConnectionHistory.Last();
-                        Console.WriteLine($"Last login: {lastLogin.date}, succesful: {lastLogin.success}");
-                        UserControl(user);
-                    }
-                    else
-                    {
-                        attempts--;
-                        if (attempts == 0)
-                            Console.WriteLine($"Out of attempts...");
-                        else
-                            Console.WriteLine($"Invalid password, please try again(attempts left {attempts})!");
-                        continue;
-                    }
-
-                    attempts = 0;
-                }
+                _running = false;
+                continue;
             }
-        }
 
-        private void UserControl(User user)
+            if (!_userService.UserExists(username))
+                Console.WriteLine("No user found, please register!");
+
+            UserLogin(username);
+        }
+    }
+
+    private void UserLogin(string username)
+    {
+        var attempts = 3;
+        while (attempts > 0)
         {
-            Console.WriteLine("Welcome(- to logout, H for login history)");
-            while (true)
+            if (!TakeInput("password", out var password))
+                continue;
+
+            var userResult = _userService.Authenticate(username, password, true);
+
+            if (!userResult.Success)
             {
-                var input = Console.ReadLine();
-
-                if (String.IsNullOrWhiteSpace(input))
-                {
-                    Console.WriteLine("Please enter a valid username!");
-                    continue;
-                }
-
-                if (input == "-")
-                {
-                    Console.WriteLine("Logged out!");
-                    break;
-                }
-
-                if (input == "H")
-                {
-                    Console.WriteLine(String.Join('\n', user.GetConnectionHistory.Select(login => $"{login.date}: {login.success}")));
-                    continue;
-                }
+                attempts--;
+                Console.WriteLine(attempts == 0
+                    ? "Out of attempts..."
+                    : $"{userResult.Error} (attempts left {attempts})!");
+                continue;
             }
-        }
 
-        private bool TakeInput(string param, out string input)
+            var user = userResult.Value!;
+            Console.WriteLine("Auth with success!");
+            var lastLogin = user.ConnectionAttempts.GetHistory().Last();
+            Console.WriteLine($"Last login: {lastLogin.date}, successful: {lastLogin.success}");
+            user.UserControl();
+            break;
+        }
+    }
+
+    private bool TakeInput(string param, out string input)
+    {
+        Console.WriteLine($"Enter a {param}: ");
+        var userInput = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(userInput))
         {
-            Console.WriteLine($"Enter a {param}: ");
-            var userInput = Console.ReadLine();
-
-            if (String.IsNullOrWhiteSpace(userInput))
-            {
-                Console.WriteLine($"Please enter a valid {param}!");
-                input = string.Empty;
-                return false;
-            }
-            input = userInput;
-            return true;
+            Console.WriteLine($"Please enter a valid {param}!");
+            input = string.Empty;
+            return false;
         }
+
+        input = userInput;
+        return true;
     }
 }
