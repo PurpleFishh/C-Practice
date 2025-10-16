@@ -2,9 +2,9 @@
 
 namespace P5_Vreme
 {
-    internal static class WeatherDataHelpers
+    public static class WeatherDataHelpers
     {
-        public static readonly ImmutableDictionary<string, Dictionary<Season, double>> immutableDictionary = new Dictionary<string, Dictionary<Season, double>>
+        public static readonly ImmutableDictionary<string, Dictionary<Season, double>> ImmutableDictionary = new Dictionary<string, Dictionary<Season, double>>
         {
             ["Bucuresti"] = new Dictionary<Season, double> { { Season.Iarna, 1.0 }, { Season.Primavara, 12.0 }, { Season.Vara, 23.5 }, { Season.Toamna, 12.5 } },
             ["Cluj-Napoca"] = new Dictionary<Season, double> { { Season.Iarna, -1.0 }, { Season.Primavara, 10.0 }, { Season.Vara, 20.5 }, { Season.Toamna, 10.5 } },

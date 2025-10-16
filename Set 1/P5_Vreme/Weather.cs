@@ -1,79 +1,81 @@
-﻿using P5_Vreme;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Login
+namespace P5_Vreme;
+
+public class Weather
 {
-    public class Weather
+    private bool _running = true;
+
+    public Weather()
     {
-        private bool _running = true;
+        Main();
+    }
 
-        public Weather()
+    private void Main()
+    {
+        Console.WriteLine("Weather is running(- to stop it)");
+        while (_running)
         {
-            Main();
-        }
+            if (!TakeInput("temp", out var input))
+                continue;
 
-        private void Main()
-        {
-            Console.WriteLine("Weather is running(- to stop it)");
-            while (_running)
+            if (input == "-")
             {
-                if (!TakeInput("temp", out string input))
-                    continue;
-
-                if (input == "-")
-                {
-                    _running = false;
-                    continue;
-                }
-
-                if (!Double.TryParse(input, out double temp))
-                {
-                    Console.WriteLine("Enter valid temperature!");
-                    continue;
-                }
-
-                Console.WriteLine($"Cities {String.Join(',', WeatherData.Data.Keys)}");
-                if (!TakeInput("city", out string city))
-                    continue;
-                if (!WeatherData.Data.ContainsKey(city))
-                {
-                    Console.WriteLine($"{city} is not a valid city!");
-                    continue;
-                }
-
-                var currentSeasson = SeassonHelper.SeasonFromMonth(DateTime.UtcNow.Month);
-                var seassonMean = WeatherData.Data[city][currentSeasson];
-                Console.WriteLine($"Your temperature is {DescribeTemperature(temp, seassonMean)}");
+                _running = false;
+                continue;
             }
-        }
 
-        static string DescribeTemperature(double temp, double mean)
-        {
-            double diff = temp - mean;
-            if (diff > 7) return "very hot";
-            if (diff > 3) return "hot";
-            if (diff < -3) return "cold";
-            return "normal";
-        }
-
-        private bool TakeInput(string param, out string input)
-        {
-            Console.WriteLine($"Enter a {param}: ");
-            var userInput = Console.ReadLine();
-
-            if (String.IsNullOrWhiteSpace(userInput))
+            if (!double.TryParse(input, out var temp))
             {
-                Console.WriteLine($"Please enter a valid {param}!");
-                input = string.Empty;
-                return false;
+                Console.WriteLine("Enter valid temperature!");
+                continue;
             }
-            input = userInput;
-            return true;
+
+            Console.WriteLine($"Cities {string.Join(',', WeatherData.Data.Keys)}");
+            if (!TakeInput("city", out var city))
+                continue;
+            if (!WeatherData.Data.ContainsKey(city))
+            {
+                Console.WriteLine($"{city} is not a valid city!");
+                continue;
+            }
+
+            var currentSeason = SeasonHelper.SeasonFromMonth(DateTime.UtcNow.Month);
+            var seasonMean = WeatherData.Data[city][currentSeason];
+            Console.WriteLine($"Your temperature is {DescribeTemperature(temp, seasonMean)}");
         }
+    }
+
+    static string DescribeTemperature(double temp, double mean)
+    {
+        var diff = temp - mean;
+        return diff switch
+        {
+            > 7 => "very hot",
+            > 3 => "hot",
+            < -3 => "cold",
+            _ => "normal"
+        };
+    }
+
+    private bool TakeInput(string param, out string input)
+    {
+        Console.WriteLine($"Enter a {param}: ");
+        var userInput = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(userInput))
+        {
+            Console.WriteLine($"Please enter a valid {param}!");
+            input = string.Empty;
+            return false;
+        }
+
+        input = userInput;
+        return true;
     }
 }

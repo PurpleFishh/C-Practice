@@ -35,22 +35,4 @@ namespace P5_Vreme
             ["Deva"] = new Dictionary<Season, double> { { Season.Iarna, 0.0 }, { Season.Primavara, 10.5 }, { Season.Vara, 21.0 }, { Season.Toamna, 10.5 } },
         }.ToImmutableDictionary();
     }
-
-    public static class SeassonHelper
-    {
-        public static Season SeasonFromMonth(int month)
-        {
-            switch (month)
-            {
-                case 12 or 1 or 2:
-                    return Season.Iarna;
-                case 3 or 4 or 5:
-                    return Season.Primavara;
-
-                case 6 or 7 or 8: return Season.Vara;
-                case 9 or 10 or 11: return Season.Toamna;
-                default: return Season.Primavara;
-            }
-        }
-    }
 }
