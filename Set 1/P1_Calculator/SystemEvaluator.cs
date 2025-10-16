@@ -9,13 +9,8 @@ namespace P1_Calculator
 {
     public class SystemEvaluator : IEvaluator
     {
-        private DataTable table;
+        private readonly DataTable _table = new();
 
-        public SystemEvaluator()
-        {
-            table = new DataTable();
-        }
-
-        double IEvaluator.Evaluate(string expr) => Convert.ToDouble(table.Compute(expr, null));
+        double IEvaluator.Evaluate(string expr) => Convert.ToDouble(_table.Compute(expr, null));
     }
 }
