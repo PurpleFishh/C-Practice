@@ -1,7 +1,6 @@
-﻿namespace P7_Ghici
+﻿namespace P7_Ghici;
+
+public interface INumberGenerator
 {
-    public interface INumberGenerator
-    {
-        int GenerateNumber(int? leftRange, int? rightRange);
-    }
+    int GenerateNumber(int? leftRange, int? rightRange);
 }
