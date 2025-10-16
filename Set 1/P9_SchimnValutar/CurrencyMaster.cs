@@ -6,78 +6,77 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P9_Schimb_Valutar
+namespace P9_Schimb_Valutar;
+
+public class CurrencyMaster
 {
-    public class CurrencyMaster
+    private bool _running = true;
+    private readonly Dictionary<DateTime, Dictionary<Currency, decimal>> _data;
+
+    public CurrencyMaster()
     {
-        private bool _running = true;
-        private readonly Dictionary<DateTime, Dictionary<CurrencyData.Currency, decimal>> _data;
+        _data = CurrencyData.GetData();
+        Main();
+    }
 
-        public CurrencyMaster()
+    private void Main()
+    {
+        Console.WriteLine("Schimb Valutar is running(- to stop it)");
+        while (_running)
         {
-            _data = CurrencyData.GetData();
-            Main();
-        }
+            if (!TakeInput("money", out var input))
+                continue;
 
-        private void Main()
-        {
-            Console.WriteLine("Schimb Valutar is running(- to stop it)");
-            while (_running)
+            if (input == "-")
             {
-                if (!TakeInput("money", out var input))
-                    continue;
+                _running = false;
+                continue;
+            }
 
-                if (input == "-")
-                {
-                    _running = false;
-                    continue;
-                }
+            if (!decimal.TryParse(input, out var money))
+            {
+                Console.WriteLine("Enter valid money!");
+                continue;
+            }
 
-                if (!decimal.TryParse(input, out var money))
-                {
-                    Console.WriteLine("Enter valid money!");
-                    continue;
-                }
+            Console.WriteLine($"Currency table for {money}RON");
 
-                Console.WriteLine($"Currency table for {money}RON");
+            var today = DateTime.Today;
+            var tblSpace = $"{DateFormat(today)}".Length + 3;
+            // var tblSpace = $"{_data[DateTime.Today][CurrencyData.Currency.Eur] * money}".Length + 3;
+            var tbl = new Table(tblSpace);
 
-                var today = DateTime.Today;
-                var tblSpace = $"{DateFormat(today)}".Length + 3;
-                // var tblSpace = $"{_data[DateTime.Today][CurrencyData.Currency.Eur] * money}".Length + 3;
-                var tbl = new Table(tblSpace);
+            tbl.PrintCell("Date/Curreny");
+            // Enumerable.Range(0, 30).Select(i => DateTime.Today.AddDays(-i)).ToList().ForEach(type => tbl.PrintCell(type));
+            Enum.GetNames(typeof(Currency)).ToList().ForEach(type => tbl.PrintCell(type));
+            tbl.EndLine();
 
-                tbl.PrintCell("Date/Curreny");
-                // Enumerable.Range(0, 30).Select(i => DateTime.Today.AddDays(-i)).ToList().ForEach(type => tbl.PrintCell(type));
-                Enum.GetNames(typeof(CurrencyData.Currency)).ToList().ForEach(type => tbl.PrintCell(type));
+
+            for (var i = 0; i < 30; i++)
+            {
+                var date = today.AddDays(-i);
+                tbl.PrintCell(DateFormat(date));
+                _data[date].Values.ToList().ForEach(val => tbl.PrintCell($"{money / val:0.00}"));
                 tbl.EndLine();
-
-
-                for (var i = 0; i < 30; i++)
-                {
-                    var date = today.AddDays(-i);
-                    tbl.PrintCell(DateFormat(date));
-                    _data[date].Values.ToList().ForEach(val => tbl.PrintCell($"{money / val:0.00}"));
-                    tbl.EndLine();
-                }
             }
         }
+    }
 
-        private string DateFormat(DateTime date) => date.ToShortDateString();
+    private string DateFormat(DateTime date) => date.ToShortDateString();
 
-        private bool TakeInput(string param, out string input)
+    private bool TakeInput(string param, out string input)
+    {
+        Console.WriteLine($"Enter a {param}: ");
+        var userInput = Console.ReadLine();
+
+        if (String.IsNullOrWhiteSpace(userInput))
         {
-            Console.WriteLine($"Enter a {param}: ");
-            var userInput = Console.ReadLine();
-
-            if (String.IsNullOrWhiteSpace(userInput))
-            {
-                Console.WriteLine($"Please enter a valid {param}!");
-                input = string.Empty;
-                return false;
-            }
-
-            input = userInput;
-            return true;
+            Console.WriteLine($"Please enter a valid {param}!");
+            input = string.Empty;
+            return false;
         }
+
+        input = userInput;
+        return true;
     }
 }
