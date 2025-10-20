@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P8_Secv", "P8_Secv\P8_Secv.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P9_SchimnValutar", "P9_SchimnValutar\P9_SchimnValutar.csproj", "{6E53C3B0-EC8E-4225-8033-119E6B3CF6E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P12_Impartitor", "P12_Impartitor\P12_Impartitor.csproj", "{87C46A17-D217-41D0-B5D7-9E361D881B00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{6E53C3B0-EC8E-4225-8033-119E6B3CF6E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E53C3B0-EC8E-4225-8033-119E6B3CF6E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E53C3B0-EC8E-4225-8033-119E6B3CF6E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87C46A17-D217-41D0-B5D7-9E361D881B00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87C46A17-D217-41D0-B5D7-9E361D881B00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87C46A17-D217-41D0-B5D7-9E361D881B00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87C46A17-D217-41D0-B5D7-9E361D881B00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
