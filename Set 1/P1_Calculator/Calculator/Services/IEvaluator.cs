@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P1_Calculator
+namespace P1_Calculator.Calculator.Services;
+
+public interface IEvaluator
 {
-    public interface IEvaluator
-    {
-        double Evaluate(string expression);
-    }
+    double Evaluate(string expression);
 }
