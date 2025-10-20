@@ -1,18 +1,24 @@
-﻿namespace P10_Diacritice;
+﻿using System.Collections;
+using System.Collections.Immutable;
+using P10_Diacritice.TextOperator;
+
+namespace P10_Diacritice;
 
 public class TextAnnalize
 {
     private bool _running = true;
-    private readonly char[] _romanianDiacritics = { 'ă', 'â', 'î', 'ș', 'ț' };
+    private readonly ImmutableList<TextOperations> _operations;
 
     public TextAnnalize()
     {
+        _operations = ImmutableList.Create(Enum.GetValues<TextOperations>());
+
         Main();
     }
 
     private void Main()
     {
-        Console.WriteLine("Gaseste diacritica is running(- to stop it)");
+        Console.WriteLine("Text info is running(- to stop it)");
         while (_running)
         {
             if (!TakeInput("text", out var input))
@@ -24,11 +30,29 @@ public class TextAnnalize
                 continue;
             }
 
-            var diacriticCount = input
-                .ToLower()
-                .Count(c => _romanianDiacritics.Contains(c));
-            
-            Console.WriteLine($"The text contains {diacriticCount} diacritics.");
+            var results = Operations.ApplyOperations(_operations, input);
+            results.ToList().ForEach(res => PrintOperationResult(res.Operation, res.Result));
+        }
+    }
+
+    private void PrintOperationResult(TextOperations op, int result)
+    {
+        switch (op)
+        {
+            case TextOperations.VowelsNumber:
+                Console.WriteLine($"The text contains {result} vowels.");
+                break;
+            case TextOperations.ConsonantsNumber:
+                Console.WriteLine($"The text contains {result} consonants.");
+                break;
+            case TextOperations.WordsNumber:
+                Console.WriteLine($"The text contains {result} words.");
+                break;
+            case TextOperations.CharactersNumber:
+                Console.WriteLine($"The text contains {result} characters.");
+                break;
+            default:
+                throw new InvalidOperationException("Unsupported operation");
         }
     }
 
