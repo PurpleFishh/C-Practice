@@ -1,4 +1,4 @@
-﻿namespace P15_Magazin;
+﻿namespace P16_Masini;
 
 public static class InputHelper
 {
